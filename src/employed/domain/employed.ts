@@ -1,6 +1,6 @@
 export class Employed {
 	constructor(
-		readonly id: number | null,
+		readonly id: number,
 		readonly name: string,
 		readonly surname: string,
 		readonly email: string,

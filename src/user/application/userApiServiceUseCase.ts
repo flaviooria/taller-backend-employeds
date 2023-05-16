@@ -1,7 +1,7 @@
 import { UserInterface } from '../domain/interfaces/userInterface';
 import { User } from '../domain/user';
 
-export class UserService {
+export class UserApiServiceUseCase {
 	constructor(private readonly userRepository: UserInterface) {}
 
 	async createUser(name: string, email: string): Promise<User> {

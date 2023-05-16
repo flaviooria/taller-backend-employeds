@@ -8,9 +8,10 @@
     "build:clean" : "rimraf build; exit 0",
     "build:tsc": "tsc -p tsconfig.json",
     "format": "prettier --write \"src/**/*.ts\"",
-    "dev": "ts-node-dev ./src/main.ts && npx prisma studio",
+    "dev": "ts-node ./src/main.ts",
     "tsc": "tsc",
     "start": "node build/src/main.js",
+    "studio": "npx prisma studio",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

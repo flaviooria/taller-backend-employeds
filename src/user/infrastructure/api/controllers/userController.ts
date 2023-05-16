@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { SendWelcomeMessageUseCase } from '../../../application/sendWelcomeMessageUseCase';
-import { UserService } from '../../../application/userService';
+import { UserApiServiceUseCase } from '../../../application/userApiServiceUseCase';
 
 export class UserController {
 	constructor(
 		private readonly welcomeSendEmail: SendWelcomeMessageUseCase,
-		private readonly userService: UserService,
+		private readonly userService: UserApiServiceUseCase,
 	) {}
 
 	public async sendEmail(req: Request, res: Response) {

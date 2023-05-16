@@ -3,28 +3,73 @@ import { EmployedInterface } from '../../domain/interfaces/employedInterface';
 import prisma from '../../../../prisma/client';
 
 export class SqliteEmployedRepository implements EmployedInterface {
-	async getAllEmployeds(): Promise<Employed[]> {
+	private employedsMemoization: Map<number, Employed> = new Map();
+
+	private getEmployedFromMemoization(id: number): Employed | null {
+		const employedFounded = this.employedsMemoization.get(id);
+
+		if (!employedFounded) return null;
+
+		return employedFounded;
+	}
+
+	private setEmployedToMemoization(employed: Employed): void {
+		this.employedsMemoization.set(employed.id, employed);
+	}
+
+	public async getAllEmployeds(): Promise<Employed[]> {
 		return await prisma.employed.findMany();
 	}
 
-	async getEmployedById(id: number): Promise<Employed | null> {
+	public async getEmployedById(id: number): Promise<Employed | null> {
 		if (!id) {
 			throw new Error('Id field not found');
 		}
 
-		return await prisma.employed.findUnique({ where: { id } });
+		const employedInMemory = this.getEmployedFromMemoization(id);
+
+		if (employedInMemory) return employedInMemory;
+		else {
+			const employedInDb = await prisma.employed.findUnique({ where: { id } });
+
+			if (!employedInDb) return null;
+
+			this.setEmployedToMemoization(employedInDb);
+			return employedInDb;
+		}
 	}
 
-	async createEmployed(employed: Employed): Promise<Employed> {
-		throw new Error('Method not implemented.');
+	public async createEmployed(
+		employed: Omit<Employed, 'id'>,
+	): Promise<Employed> {
+		const { name, surname, email, password, isAdmin } = employed;
+
+		return await prisma.employed.create({
+			data: {
+				name,
+				surname,
+				email,
+				password,
+				isAdmin
+			},
+		});
 	}
-	async updateEmployed(
+
+	public async updateEmployed(
 		id: number,
 		fieldsToUpdate: Partial<Employed>,
 	): Promise<Employed> {
-		throw new Error('Method not implemented.');
+		return await prisma.employed.update({
+			data: { ...fieldsToUpdate },
+			where: { id },
+		});
 	}
-	async deleteEmployed(id: number): Promise<Employed> {
-		throw new Error('Method not implemented.');
+
+	public async deleteEmployed(id: number): Promise<Employed> {
+		if (!id) {
+			throw new Error('Id field not found');
+		}
+
+		return await prisma.employed.delete({ where: { id } });
 	}
 }
