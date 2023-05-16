@@ -10,6 +10,8 @@ app.use(urlencoded({ extended: true }));
 
 initRouter(app);
 
-app.listen(3001, () => {
+const port: string | number = process.env.PORT || 3001;
+
+app.listen(Number(port),'0.0.0.0',() => {
 	console.log('listen on port 3001');
 });
