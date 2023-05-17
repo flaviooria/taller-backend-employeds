@@ -61,7 +61,7 @@ export class EmployedController {
 				surname,
 				email,
 				password,
-				isAdmin
+				isAdmin,
 			);
 
 			res.status(201).send(employedCreated);
