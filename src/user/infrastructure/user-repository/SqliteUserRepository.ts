@@ -34,9 +34,9 @@ export class SqliteUserRepository implements UserInterface {
 	}
 
 	async sendEmail(email: string): Promise<boolean | void> {
-		const hostname = 'smtp-relay.sendinblue.com';
-		const username = 'flaviooria.dev@gmail.com';
-		const password = 'BQDyaxAr5FZOd2R1';
+		const hostname = process.env.SMTP_HOSTNAME;
+		const username = process.env.SMTP_USERNAME;
+		const password = process.env.SMTP_PASSWORD;
 
 		let transporter = nodemailer.createTransport({
 			host: hostname,

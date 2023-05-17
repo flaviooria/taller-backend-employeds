@@ -1,6 +1,8 @@
 import express, { urlencoded } from 'express';
 import cors from 'cors';
 import { initRouter } from './init.router';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
@@ -12,6 +14,6 @@ initRouter(app);
 
 const port: string | number = process.env.PORT || 3001;
 
-app.listen(Number(port),'0.0.0.0',() => {
+app.listen(Number(port), '0.0.0.0', () => {
 	console.log('listen on port 3001');
 });
