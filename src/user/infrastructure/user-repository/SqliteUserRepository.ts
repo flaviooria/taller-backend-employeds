@@ -14,13 +14,16 @@ export class SqliteUserRepository implements UserInterface {
 				name: user.name,
 				email: user.email,
 				password: user.password,
+				isAdmin: user.isAdmin,
 			},
 		});
 
 		return userCreated;
 	}
 
-	public async signIn(user: Omit<User, 'id' | 'name'>): Promise<User | null> {
+	public async signIn(
+		user: Omit<User, 'id' | 'name' | 'isAdmin'>,
+	): Promise<User | null> {
 		const userFounded = await prisma.user.findFirst({
 			where: {
 				email: user.email,

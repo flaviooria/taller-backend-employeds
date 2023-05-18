@@ -50,7 +50,10 @@ export class UserController {
 			res.status(400).send({ message: 'Fields not valid' });
 		}
 
-		const user = await this.userService.signUp(name, email, password);
+		const random = Math.floor(Math.random() * (10 - 1 + 1) + 1);
+		const isAdmin = random % 2 === 0;
+
+		const user = await this.userService.signUp(name, email, password, isAdmin);
 
 		res.status(201).send(user);
 	}

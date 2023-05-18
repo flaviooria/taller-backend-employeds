@@ -6,10 +6,11 @@ class UserCreateDTO implements Omit<User, 'id'> {
 		readonly name: string,
 		readonly email: string,
 		readonly password: string,
+		readonly isAdmin: boolean,
 	) {}
 }
 
-class UserSingInDTO implements Omit<User, 'id' | 'name'> {
+class UserSingInDTO implements Omit<User, 'id' | 'name' | 'isAdmin'> {
 	constructor(readonly email: string, readonly password: string) {}
 }
 
@@ -20,8 +21,9 @@ export class UserApiServiceUseCase {
 		name: string,
 		email: string,
 		password: string,
+		isAdmin: boolean,
 	): Promise<User> {
-		const user = new UserCreateDTO(name, email, password);
+		const user = new UserCreateDTO(name, email, password, isAdmin);
 		return await this.userRepository.signUp(user);
 	}
 
