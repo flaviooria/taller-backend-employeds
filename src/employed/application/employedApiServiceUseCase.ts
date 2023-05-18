@@ -2,15 +2,13 @@ import { Employed } from '../domain/employed';
 import { EmployedInterface } from '../domain/interfaces/employedInterface';
 
 class EmployedCreateDTO implements Omit<Employed, 'id'> {
-	
 	constructor(
 		readonly name: string,
 		readonly surname: string,
 		readonly email: string,
 		readonly password: string,
-		readonly isAdmin: boolean
-	) {	
-	}
+		readonly isAdmin: boolean,
+	) {}
 }
 
 export class EmployedApiServiceUseCase {
@@ -29,9 +27,15 @@ export class EmployedApiServiceUseCase {
 		surname: string,
 		email: string,
 		password: string,
-		isAdmin: boolean
+		isAdmin: boolean,
 	): Promise<Employed> {
-		const employed = new EmployedCreateDTO(name, surname, email, password, isAdmin);
+		const employed = new EmployedCreateDTO(
+			name,
+			surname,
+			email,
+			password,
+			isAdmin,
+		);
 
 		return await this.employedRepository.createEmployed(employed);
 	}

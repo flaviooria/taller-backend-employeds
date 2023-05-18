@@ -3,7 +3,8 @@
 import { User } from '../user';
 
 export interface UserInterface {
-	createUser(user: User): Promise<User>;
+	signUp(user: Omit<User, 'id'>): Promise<User>;
+	signIn(user: Omit<User, 'id' | 'name'>): Promise<User | null>;
 	getUserId(id: number): Promise<User | null>;
 	sendEmail(email: string): Promise<void | boolean>;
 }
