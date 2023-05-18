@@ -1,4 +1,4 @@
-import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { User } from '../../user/domain/user';
 import { Employed } from '../../employed/domain/employed';
 
