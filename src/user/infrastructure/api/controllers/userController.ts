@@ -23,16 +23,37 @@ export class UserController {
 		res.status(200).send();
 	}
 
-	public async createUser(req: Request, res: Response) {
+	public async signIn(req: Request, res: Response) {
 		const {
-			body: { name, email },
+			body: { email, password },
+		} = req;
+
+		if (!email || !password) {
+			res.status(400).send({ message: 'Fields not valid' });
+		}
+
+		const user = await this.userService.signIn(email, password);
+
+		if (!user) {
+			res.status(404).send({ message: 'User not found' });
+		}
+
+		res.status(200).send(user);
+	}
+
+	public async signUp(req: Request, res: Response) {
+		const {
+			body: { name, email, password },
 		} = req;
 
 		if (!name || !email) {
 			res.status(400).send({ message: 'Fields not valid' });
 		}
 
-		const user = await this.userService.createUser(name, email);
+		const random = Math.floor(Math.random() * (10 - 1 + 1) + 1);
+		const isAdmin = random % 2 === 0;
+
+		const user = await this.userService.signUp(name, email, password, isAdmin);
 
 		res.status(201).send(user);
 	}

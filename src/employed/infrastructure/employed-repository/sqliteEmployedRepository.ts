@@ -50,7 +50,7 @@ export class SqliteEmployedRepository implements EmployedInterface {
 				surname,
 				email,
 				password,
-				isAdmin
+				isAdmin,
 			},
 		});
 	}

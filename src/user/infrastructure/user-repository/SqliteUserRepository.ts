@@ -8,6 +8,32 @@ import { User } from '../../domain/user';
 
 // Importamos la conexión a la db, aquí realizamos la lógica de negocio
 export class SqliteUserRepository implements UserInterface {
+	public async signUp(user: Omit<User, 'id'>): Promise<User> {
+		const userCreated = await prisma.user.create({
+			data: {
+				name: user.name,
+				email: user.email,
+				password: user.password,
+				isAdmin: user.isAdmin,
+			},
+		});
+
+		return userCreated;
+	}
+
+	public async signIn(
+		user: Omit<User, 'id' | 'name' | 'isAdmin'>,
+	): Promise<User | null> {
+		const userFounded = await prisma.user.findFirst({
+			where: {
+				email: user.email,
+				password: user.password,
+			},
+		});
+
+		return userFounded;
+	}
+
 	private usersMemoization: Map<number, User> = new Map();
 
 	private getUserFromMemoization(id: number): User | null {
@@ -20,17 +46,6 @@ export class SqliteUserRepository implements UserInterface {
 
 	private setUserToMemoization(user: User): void {
 		this.usersMemoization.set(user.id!, user);
-	}
-
-	async createUser(user: User): Promise<User> {
-		const userCreated = await prisma.user.create({
-			data: {
-				name: user.name,
-				email: user.email,
-			},
-		});
-
-		return userCreated;
 	}
 
 	async sendEmail(email: string): Promise<boolean | void> {
