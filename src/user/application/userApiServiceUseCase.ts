@@ -1,17 +1,13 @@
 import { UserInterface } from '../domain/interfaces/userInterface';
 import { User } from '../domain/user';
 
-class UserCreateDTO implements Omit<User, 'id'> {
+class UserCreateDTO implements Omit<User, 'id' | 'tokenAuth'> {
 	constructor(
 		readonly name: string,
 		readonly email: string,
 		readonly password: string,
 		readonly isAdmin: boolean,
 	) {}
-}
-
-class UserSingInDTO implements Omit<User, 'id' | 'name' | 'isAdmin'> {
-	constructor(readonly email: string, readonly password: string) {}
 }
 
 export class UserApiServiceUseCase {
@@ -27,12 +23,15 @@ export class UserApiServiceUseCase {
 		return await this.userRepository.signUp(user);
 	}
 
-	public async signIn(email: string, password: string): Promise<User | null> {
-		const user = new UserSingInDTO(email, password);
-		return await this.userRepository.signIn(user);
+	public async signIn(email: string): Promise<User | null> {
+		return await this.userRepository.signIn(email);
 	}
 
-	public async getUserById(id: number): Promise<User | null> {
-		return await this.userRepository.getUserId(id);
+	public async getUserByToken(token: string): Promise<User | null> {
+		return await this.userRepository.getUserByToken(token);
+	}
+
+	public async updateUserToken(id: number, token: string): Promise<User> {
+		return await this.userRepository.updateUserToken(id, token);
 	}
 }

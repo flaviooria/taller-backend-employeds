@@ -11,7 +11,7 @@ const controller = new UserController(welcomeSendEmail, userService);
 
 const userRouter = Router();
 
-userRouter.get('/:id', controller.getUserById.bind(controller));
+userRouter.get('/token/:token', controller.getUserByToken.bind(controller));
 userRouter.post('/register', controller.signUp.bind(controller));
 userRouter.post('/login', controller.signIn.bind(controller));
 
