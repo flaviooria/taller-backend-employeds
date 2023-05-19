@@ -6,38 +6,73 @@ import nodemailer from 'nodemailer';
 import { UserInterface } from '../../domain/interfaces/userInterface';
 import { User } from '../../domain/user';
 
+// class UserSignInResponseDTO implements Exclude<User,'password'> {
+// 	constructor() {}
+// }
+
 // Importamos la conexión a la db, aquí realizamos la lógica de negocio
 export class SqliteUserRepository implements UserInterface {
-	public async signUp(user: Omit<User, 'id'>): Promise<User> {
+	private usersMemoization: Map<string, User> = new Map();
+
+	public async signUp(user: Omit<User, 'id' | 'tokenAuth'>): Promise<User> {
 		const userCreated = await prisma.user.create({
 			data: {
 				name: user.name,
 				email: user.email,
 				password: user.password,
 				isAdmin: user.isAdmin,
+				tokenAuth: null,
 			},
 		});
 
 		return userCreated;
 	}
 
-	public async signIn(
-		user: Omit<User, 'id' | 'name' | 'isAdmin'>,
-	): Promise<User | null> {
-		const userFounded = await prisma.user.findFirst({
+	public async signIn(email: string): Promise<User | null> {
+		const userInMemory = this.getUserFromMemoization(email);
+
+		if (userInMemory) return userInMemory;
+		else {
+			const userFounded = await prisma.user.findFirst({
+				where: {
+					email,
+				},
+			});
+
+			if (!userFounded) return null;
+			else {
+				this.setUserToMemoization(userFounded!);
+				return userFounded;
+			}
+		}
+	}
+
+	public async updateUserToken(id: number, token: string): Promise<User> {
+		if (!id) {
+			throw Error('Id not found');
+		}
+
+		if (!token) {
+			throw Error('Token not found');
+		}
+
+		const userUpdated = await prisma.user.update({
 			where: {
-				email: user.email,
-				password: user.password,
+				id: id,
+			},
+			data: {
+				tokenAuth: token,
 			},
 		});
 
-		return userFounded;
+		// Set user updated
+		this.setUserToMemoization(userUpdated);
+
+		return userUpdated;
 	}
 
-	private usersMemoization: Map<number, User> = new Map();
-
-	private getUserFromMemoization(id: number): User | null {
-		const userFounded = this.usersMemoization.get(id);
+	private getUserFromMemoization(email: string): User | null {
+		const userFounded = this.usersMemoization.get(email);
 
 		if (!userFounded) return null;
 
@@ -45,10 +80,10 @@ export class SqliteUserRepository implements UserInterface {
 	}
 
 	private setUserToMemoization(user: User): void {
-		this.usersMemoization.set(user.id!, user);
+		this.usersMemoization.set(user.email!, user);
 	}
 
-	async sendEmail(email: string): Promise<boolean | void> {
+	public async sendEmail(name: string, email: string): Promise<boolean | void> {
 		const hostname = process.env.SMTP_HOSTNAME;
 		const username = process.env.SMTP_USERNAME;
 		const password = process.env.SMTP_PASSWORD;
@@ -67,31 +102,27 @@ export class SqliteUserRepository implements UserInterface {
 
 		// send mail with defined transport object
 		let info = await transporter.sendMail({
-			from: '"Sender Name" <from@cloudmta.com>',
+			from: '"Taller Xauen Devs" <flaviodev@xauendevs.com>',
 			to: email,
-			subject: 'Hello from node',
-			text: 'Hello world?',
-			html: '<strong>Hello world?</strong>',
+			subject: 'Descubriendo Sveltekit',
+			text: `Hola ${name} bienvenido a la charla, espero que te guste!!!`,
+			html: `<strong>Hola ${name} bienvenido a la charla, espero que te guste!!!</strong>`,
 		});
 
 		console.log('Message sent: %s', info.response);
 	}
 
-	async getUserId(id: number): Promise<User | null> {
-		if (!id) {
-			throw new Error('Id field not found');
+	async getUserByToken(token: string): Promise<User | null> {
+		if (!token) {
+			throw new Error('Token field not found');
 		}
 
-		const user = this.getUserFromMemoization(id);
+		const userFoundedFromDb = await prisma.user.findFirst({
+			where: {
+				tokenAuth: token,
+			},
+		});
 
-		if (user) return user;
-		else {
-			const userFoundedFromDb = await prisma.user.findUnique({ where: { id } });
-
-			if (!userFoundedFromDb) return null;
-
-			this.setUserToMemoization(userFoundedFromDb);
-			return userFoundedFromDb;
-		}
+		return userFoundedFromDb;
 	}
 }

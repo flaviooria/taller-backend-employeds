@@ -3,8 +3,9 @@
 import { User } from '../user';
 
 export interface UserInterface {
-	signUp(user: Omit<User, 'id'>): Promise<User>;
-	signIn(user: Omit<User, 'id' | 'name' | 'isAdmin'>): Promise<User | null>;
-	getUserId(id: number): Promise<User | null>;
-	sendEmail(email: string): Promise<void | boolean>;
+	signUp(user: Omit<User, 'id' | 'tokenAuth'>): Promise<User>;
+	signIn(email: string): Promise<User | null>;
+	getUserByToken(token: string): Promise<User | null>;
+	updateUserToken(id: number, token: string): Promise<User>;
+	sendEmail(name: string, email: string): Promise<void | boolean>;
 }
