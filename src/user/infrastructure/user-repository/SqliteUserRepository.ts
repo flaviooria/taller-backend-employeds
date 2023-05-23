@@ -71,6 +71,25 @@ export class SqliteUserRepository implements UserInterface {
 		return userUpdated;
 	}
 
+	public async getUserByEmail(email: string): Promise<User | null> {
+		const userInMemory = this.getUserFromMemoization(email);
+
+		if (userInMemory) return userInMemory;
+		else {
+			const userFounded = await prisma.user.findFirst({
+				where: {
+					email,
+				},
+			});
+
+			if (!userFounded) return null;
+			else {
+				this.setUserToMemoization(userFounded!);
+				return userFounded;
+			}
+		}
+	}
+
 	private getUserFromMemoization(email: string): User | null {
 		const userFounded = this.usersMemoization.get(email);
 

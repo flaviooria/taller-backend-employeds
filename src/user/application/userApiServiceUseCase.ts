@@ -27,6 +27,10 @@ export class UserApiServiceUseCase {
 		return await this.userRepository.signIn(email);
 	}
 
+	public async getUserByEmail(email: string): Promise<User | null> {
+		return await this.userRepository.getUserByEmail(email);
+	}
+
 	public async getUserByToken(token: string): Promise<User | null> {
 		return await this.userRepository.getUserByToken(token);
 	}
