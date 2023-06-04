@@ -42,16 +42,9 @@ export class SqliteEmployedRepository implements EmployedInterface {
 	public async createEmployed(
 		employed: Omit<Employed, 'id'>,
 	): Promise<Employed> {
-		const { name, surname, email, password, isAdmin } = employed;
-
+		const { name, surname, email, password, jobPosition } = employed;
 		return await prisma.employed.create({
-			data: {
-				name,
-				surname,
-				email,
-				password,
-				isAdmin,
-			},
+			data: { name, surname, email, password, jobPosition },
 		});
 	}
 

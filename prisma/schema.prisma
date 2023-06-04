@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["extendedWhereUnique"]
 }
 
 datasource db {
@@ -8,19 +9,20 @@ datasource db {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
   email     String
   password  String
-  tokenAuth String? @default(uuid())
-  isAdmin   Boolean @default(false)
+  tokenAuth String?  @default(uuid())
+  isAdmin   Boolean? @default(true)
+  isVerify  Boolean? @default(false)
 }
 
 model Employed {
-  id       Int     @id @default(autoincrement())
-  name     String
-  surname  String
-  email    String
-  password String
-  isAdmin  Boolean
+  id          Int    @id @default(autoincrement())
+  name        String
+  surname     String
+  email       String
+  password    String
+  jobPosition String
 }

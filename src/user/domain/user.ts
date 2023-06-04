@@ -5,6 +5,7 @@ export class User {
 		readonly email: string,
 		readonly password: string,
 		readonly tokenAuth: string | null,
-		readonly isAdmin: boolean,
+		readonly isAdmin: boolean | null,
+		readonly isVerify: boolean | null,
 	) {}
 }

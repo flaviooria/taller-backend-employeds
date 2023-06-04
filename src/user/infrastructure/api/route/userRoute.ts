@@ -24,8 +24,8 @@ const controller = new UserController(
 
 const userRouter = Router();
 
-userRouter.get('/me', controller.getUser.bind(controller));
-userRouter.get('/token/:token', controller.getUserByToken.bind(controller));
+userRouter.get('/me', controller.getUserByTokenJWT.bind(controller));
+userRouter.get('/:token', controller.verifyUserMember.bind(controller));
 userRouter.post('/register', controller.signUp.bind(controller));
 userRouter.post('/login', controller.signIn.bind(controller));
 

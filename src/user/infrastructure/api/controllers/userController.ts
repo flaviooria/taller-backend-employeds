@@ -40,24 +40,13 @@ export class UserController {
 			}
 
 			// Generate token
-			const token = this.authJwtService.generateToken(user, 30);
+			const token = this.authJwtService.generateToken(user.email, 30);
 
-			const userWithTokenUpdated = await this.userService.updateUserToken(
-				user?.id!,
-				token,
-			);
-
-			const {
-				id,
-				name,
-				email: emailUser,
-				isAdmin,
-				tokenAuth,
-			} = { ...userWithTokenUpdated };
+			const { id, name, email: emailUser, isAdmin, isVerify } = { ...user };
 
 			res
 				.status(200)
-				.send({ id, name, email: emailUser, token: tokenAuth, isAdmin });
+				.send({ id, name, email: emailUser, token, isAdmin, verify: isVerify });
 		} catch (error: any) {
 			res
 				.status(error?.status || 500)
@@ -75,26 +64,23 @@ export class UserController {
 				res.status(400).send({ message: 'Fields not valid' });
 			}
 
-			let isAdmin = false;
-
-			if (email.includes('@xauendevs.com')) {
-				isAdmin = true;
-			}
-
 			const saltRound = 10;
 			const salt = bcrypt.genSaltSync(saltRound);
 			const hashPassword = bcrypt.hashSync(password, salt);
+
+			const token = this.authJwtService.generateToken(email, 30);
 
 			const user = await this.userService.signUp(
 				name,
 				email,
 				hashPassword,
-				isAdmin,
+				token,
 			);
 
 			if (user.email.includes('@gmail.com')) {
-				await this.welcomeSendEmail.sendEmail(user.name, user.email);
+				await this.welcomeSendEmail.sendEmail(user.name, user.email, token);
 			}
+
 			res.status(201).send(user);
 		} catch (error: any) {
 			res
@@ -103,36 +89,7 @@ export class UserController {
 		}
 	}
 
-	public async getUserByToken(req: Request, res: Response) {
-		try {
-			const {
-				params: { token },
-			} = req;
-
-			const userFounded = await this.userService.getUserByToken(token);
-
-			if (!userFounded) {
-				res.status(404).send({ message: 'User not found' });
-				return;
-			}
-
-			const {
-				id,
-				name,
-				email: emailUser,
-				isAdmin,
-				tokenAuth,
-			} = { ...userFounded };
-
-			res.status(200).send({ id, name, email: emailUser, isAdmin, tokenAuth });
-		} catch (error: any) {
-			res
-				.status(error?.status || 500)
-				.send({ message: error?.message || 'Internal server error' });
-		}
-	}
-
-	public async getUser(req: Request, res: Response) {
+	public async getUserByTokenJWT(req: Request, res: Response) {
 		try {
 			const {
 				headers: { authorization },
@@ -158,6 +115,37 @@ export class UserController {
 			} = { ...userFounded };
 
 			res.status(200).send({ id, name, email: emailUser, isAdmin, tokenAuth });
+		} catch (error: any) {
+			res
+				.status(error?.status || 500)
+				.send({ message: error?.message || 'Internal server error' });
+		}
+	}
+
+	public async verifyUserMember(req: Request, res: Response) {
+		try {
+			const {
+				params: { token },
+			} = req;
+
+			if (!token) {
+				res.status(400).send({ message: 'Token not found' });
+			}
+
+			const payload = this.authJwtService.verifySignature(token!) as JwtPayload;
+
+			const emailUser = payload.sub;
+
+			// Update isVerify of user
+			const userUpdated = await this.userService.updateVerifyUser(
+				<string>emailUser,
+			);
+
+			if (!userUpdated) {
+				res.status(400).send({ message: 'User verify account incorrect' });
+			}
+
+			res.status(200).send({ message: 'User verify account correct' });
 		} catch (error: any) {
 			res
 				.status(error?.status || 500)

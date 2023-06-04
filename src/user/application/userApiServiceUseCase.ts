@@ -1,12 +1,12 @@
 import { UserInterface } from '../domain/interfaces/userInterface';
 import { User } from '../domain/user';
 
-class UserCreateDTO implements Omit<User, 'id' | 'tokenAuth'> {
+class UserCreateDTO implements Omit<User, 'id' | 'isAdmin' | 'isVerify'> {
 	constructor(
 		readonly name: string,
 		readonly email: string,
 		readonly password: string,
-		readonly isAdmin: boolean,
+		readonly tokenAuth: string,
 	) {}
 }
 
@@ -17,9 +17,9 @@ export class UserApiServiceUseCase {
 		name: string,
 		email: string,
 		password: string,
-		isAdmin: boolean,
+		token: string,
 	): Promise<User> {
-		const user = new UserCreateDTO(name, email, password, isAdmin);
+		const user = new UserCreateDTO(name, email, password, token);
 		return await this.userRepository.signUp(user);
 	}
 
@@ -31,11 +31,7 @@ export class UserApiServiceUseCase {
 		return await this.userRepository.getUserByEmail(email);
 	}
 
-	public async getUserByToken(token: string): Promise<User | null> {
-		return await this.userRepository.getUserByToken(token);
-	}
-
-	public async updateUserToken(id: number, token: string): Promise<User> {
-		return await this.userRepository.updateUserToken(id, token);
+	public async updateVerifyUser(email: string): Promise<User> {
+		return await this.userRepository.verifyUser(email);
 	}
 }

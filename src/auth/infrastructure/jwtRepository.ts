@@ -1,7 +1,6 @@
 import jwt, { JwtPayload, JsonWebTokenError } from 'jsonwebtoken';
 
 import { JwtInterface } from '../domain/interface/jwtInterface';
-import { ValidTypesToAuth } from '../../../types';
 
 export class JwtRepository implements JwtInterface {
 	protected addMinutes(date: Date, minutes: number): number {
@@ -10,10 +9,10 @@ export class JwtRepository implements JwtInterface {
 		return date.getTime();
 	}
 
-	generateToken(object: ValidTypesToAuth, minutesToExpiration: number): string {
+	generateToken(email: string, minutesToExpiration: number): string {
 		try {
 			const payload: JwtPayload = {
-				sub: object.email,
+				sub: email,
 				exp: this.addMinutes(new Date(), minutesToExpiration),
 			};
 

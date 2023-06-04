@@ -1,3 +1,5 @@
+import { JobPositions } from '../../../types';
+
 export class Employed {
 	constructor(
 		readonly id: number,
@@ -5,6 +7,6 @@ export class Employed {
 		readonly surname: string,
 		readonly email: string,
 		readonly password: string,
-		readonly isAdmin: boolean = false,
+		readonly jobPosition: string | JobPositions,
 	) {}
 }

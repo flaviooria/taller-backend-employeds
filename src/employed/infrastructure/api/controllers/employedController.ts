@@ -39,7 +39,7 @@ export class EmployedController {
 
 	public async createEmployed(req: Request, res: Response) {
 		const {
-			body: { name, surname, email, password, isAdmin },
+			body: { name, surname, email, password, jobPosition },
 		} = req;
 
 		try {
@@ -51,7 +51,9 @@ export class EmployedController {
 				!email ||
 				email === '' ||
 				!password ||
-				password === ''
+				password === '' ||
+				!jobPosition ||
+				jobPosition === ''
 			) {
 				res.status(400).send({ message: 'Fields not accepted' });
 			}
@@ -61,7 +63,7 @@ export class EmployedController {
 				surname,
 				email,
 				password,
-				isAdmin,
+				jobPosition,
 			);
 
 			res.status(201).send(employedCreated);
@@ -75,21 +77,21 @@ export class EmployedController {
 	public async updateEmployed(req: Request, res: Response) {
 		const {
 			params: { id },
-			body: { name, surname, email, password },
+			body: { name, surname, email, password, jobPosition },
 		} = req;
+
+		if (!id || id === '') {
+			res.status(400).send({ message: 'Field id not found' });
+			return;
+		}
 
 		try {
 			if (
-				!id ||
-				id === '' ||
-				!name ||
-				name === '' ||
-				!surname ||
-				surname === '' ||
-				!email ||
-				email === '' ||
-				!password ||
-				password === ''
+				(!name || name === '') &&
+				(!surname || surname === '') &&
+				(!email || email === '') &&
+				(!password || password === '') &&
+				(!jobPosition || jobPosition === '')
 			) {
 				res.status(400).send({ message: 'Fields not accepted' });
 			}
@@ -104,7 +106,7 @@ export class EmployedController {
 
 			const employedUpdated = await this.employedService.updateEmployed(
 				Number(id),
-				req.body,
+				{ ...req.body },
 			);
 
 			res.status(200).send(employedUpdated);

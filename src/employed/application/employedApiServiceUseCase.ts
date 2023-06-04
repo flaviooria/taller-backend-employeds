@@ -1,3 +1,4 @@
+import { JobPositions } from '../../../types';
 import { Employed } from '../domain/employed';
 import { EmployedInterface } from '../domain/interfaces/employedInterface';
 
@@ -7,7 +8,7 @@ class EmployedCreateDTO implements Omit<Employed, 'id'> {
 		readonly surname: string,
 		readonly email: string,
 		readonly password: string,
-		readonly isAdmin: boolean,
+		readonly jobPosition: JobPositions,
 	) {}
 }
 
@@ -27,14 +28,14 @@ export class EmployedApiServiceUseCase {
 		surname: string,
 		email: string,
 		password: string,
-		isAdmin: boolean,
+		jobPosition: JobPositions,
 	): Promise<Employed> {
 		const employed = new EmployedCreateDTO(
 			name,
 			surname,
 			email,
 			password,
-			isAdmin,
+			jobPosition,
 		);
 
 		return await this.employedRepository.createEmployed(employed);

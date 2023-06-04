@@ -4,7 +4,7 @@ import { UserInterface } from '../domain/interfaces/userInterface';
 export class SendWelcomeMessageUseCase {
 	constructor(private readonly userRepository: UserInterface) {}
 
-	async sendEmail(name: string, email: string) {
-		await this.userRepository.sendEmail(name, email);
+	async sendEmail(name: string, email: string, token: string) {
+		await this.userRepository.sendEmail(name, email, token);
 	}
 }
